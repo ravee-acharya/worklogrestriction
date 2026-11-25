@@ -94,6 +94,26 @@ jobs:
       - name: Install Forge CLI
         run: npm install -g @forge/cli@16
 
+      - name: Check Forge credentials are present
+        # Without this, a missing secret surfaces as "Not logged in" from deep
+        # inside forge deploy, which reads like a broken pipeline rather than an
+        # unset variable.
+        env:
+          FORGE_EMAIL: ${{ secrets.FORGE_EMAIL }}
+          FORGE_API_TOKEN: ${{ secrets.FORGE_API_TOKEN }}
+        run: |
+          missing=0
+          [ -z "$FORGE_EMAIL" ] && { echo "::error::secret FORGE_EMAIL is not set"; missing=1; }
+          [ -z "$FORGE_API_TOKEN" ] && { echo "::error::secret FORGE_API_TOKEN is not set"; missing=1; }
+          if [ "$missing" = "1" ]; then
+            echo "::error::Add both as repository secrets, or as environment secrets on"
+            echo "::error::'forge-development' AND 'forge-production' — an environment secret"
+            echo "::error::set on only one environment is invisible to jobs using the other."
+            echo "::error::FORGE_API_TOKEN is an Atlassian API token, not a password."
+            exit 1
+          fi
+          echo "Both Forge credentials are present."
+
       - name: Select distribution and build
         run: npm run build:marketplace
 
@@ -147,6 +167,16 @@ jobs:
             exit 1
           fi
 
+      - name: Check Forge credentials are present
+        env:
+          FORGE_EMAIL: ${{ secrets.FORGE_EMAIL }}
+          FORGE_API_TOKEN: ${{ secrets.FORGE_API_TOKEN }}
+        run: |
+          missing=0
+          [ -z "$FORGE_EMAIL" ] && { echo "::error::secret FORGE_EMAIL is not set"; missing=1; }
+          [ -z "$FORGE_API_TOKEN" ] && { echo "::error::secret FORGE_API_TOKEN is not set"; missing=1; }
+          if [ "$missing" = "1" ]; then exit 1; fi
+          echo "Both Forge credentials are present."
       - name: Select distribution and build
         run: npm run build:internal
 
