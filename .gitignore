@@ -1,0 +1,34 @@
+node_modules/
+
+# Bundled Custom UI output — regenerate with `npm run build`.
+static/admin/main.js
+static/admin/main.js.map
+static/panel/main.js
+static/panel/main.js.map
+
+# Local fixture preview build.
+preview/
+
+# Forge CLI
+.forge/
+
+# Generated per distribution by scripts/use-manifest.mjs.
+# The committed source of truth is manifests/manifest.template.yml plus
+# manifests/variants.json. A checkout has no manifest.yml until you run
+#   npm run manifest:marketplace   (or manifest:internal)
+# which is deliberate: there is no default app, so nobody can deploy to the
+# wrong one by accident.
+manifest.yml
+
+# Internal-only — deliberately NOT in this public repository.
+#
+# docs/ carries the Jira site name, a work email, named colleagues and the
+# full August 2026 mass-deletion narrative. recovery/ is hard-coded with the
+# issue keys that incident touched. Publishing that would tie real people to
+# a timesheet-deletion incident on the open internet, and GitHub caches and
+# indexes what it receives — deleting later does not undo it.
+#
+# These live in Confluence, which is where they were written for. If they
+# ever should live alongside the code, make the repository private first.
+docs/
+recovery/

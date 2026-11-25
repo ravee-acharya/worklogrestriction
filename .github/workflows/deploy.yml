@@ -1,0 +1,175 @@
+name: Deploy
+
+# Two distributions of one codebase:
+#   marketplace — the public app (ari:...9fb33e39), intended for listing
+#   internal    — Dash's own private copy
+#
+# They are separate Forge apps with separate ids, installations and storage.
+# The internal job deploys ONLY after the marketplace job succeeds, because the
+# public listing is the one with users outside Dash: if a release is going to
+# break, it should break on the build fewest people depend on last, and the
+# internal copy should never be ahead of what was actually published.
+
+# A merge to main deploys to DEVELOPMENT, not production. Production is a
+# deliberate, manual dispatch.
+#
+# This app deletes worklogs and can impersonate users, and an earlier version of
+# it removed 1,542 of them before anyone noticed. Auto-publishing that to
+# production on every merge is more trust than the blast radius deserves; a
+# human choosing the moment costs almost nothing by comparison.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      distributions:
+        description: Which distributions to deploy
+        type: choice
+        default: both
+        options: [both, marketplace-only, internal-only]
+      environment:
+        description: Forge environment
+        type: choice
+        default: development
+        options: [development, production]
+
+# One release at a time. Two overlapping runs would race each other to deploy
+# different commits to the same app, and Forge has no locking of its own.
+concurrency:
+  group: forge-deploy
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  # ---------------------------------------------------------------- verify --
+  # Runs once. Both distributions are built from this same commit, so there is
+  # nothing to gain from testing twice.
+  verify:
+    name: Test and check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Bundle hygiene
+        # Fails if anything the Forge bundler can reach starts referencing
+        # docs/ or recovery/, which carry Dash-internal detail that must not
+        # travel to other organisations in the marketplace build.
+        run: npm run check:bundle
+
+      - name: Build bundles
+        run: npm run build
+
+  # ----------------------------------------------------------- marketplace --
+  marketplace:
+    name: Deploy marketplace app
+    needs: verify
+    if: >-
+      github.event_name == 'push' ||
+      github.event.inputs.distributions == 'both' ||
+      github.event.inputs.distributions == 'marketplace-only'
+    runs-on: ubuntu-latest
+    environment: forge-${{ github.event.inputs.environment || 'development' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Forge CLI
+        run: npm install -g @forge/cli@16
+
+      - name: Select distribution and build
+        run: npm run build:marketplace
+
+      - name: Show what is about to deploy
+        run: head -12 manifest.yml
+
+      - name: Deploy
+        env:
+          FORGE_EMAIL: ${{ secrets.FORGE_EMAIL }}
+          FORGE_API_TOKEN: ${{ secrets.FORGE_API_TOKEN }}
+          FORGE_NON_INTERACTIVE: '1'
+        run: forge deploy -e ${{ github.event.inputs.environment || 'development' }}
+
+  # -------------------------------------------------------------- internal --
+  # `needs: marketplace` is the ordering the brief asked for. On an
+  # internal-only manual run the marketplace job is skipped, and `always()`
+  # plus an explicit result check lets this one still proceed — without it a
+  # skipped dependency would skip this job too.
+  internal:
+    name: Deploy Dash internal app
+    needs: [verify, marketplace]
+    if: >-
+      always() &&
+      needs.verify.result == 'success' &&
+      (needs.marketplace.result == 'success' ||
+       (needs.marketplace.result == 'skipped' &&
+        github.event.inputs.distributions == 'internal-only'))
+    runs-on: ubuntu-latest
+    environment: forge-${{ github.event.inputs.environment || 'development' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Forge CLI
+        run: npm install -g @forge/cli@16
+
+      - name: Check the internal app has been registered
+        # use-manifest.mjs refuses to build a variant with no app id, but a bare
+        # "exit 1" deep in a build step reads as a mystery. Say why here.
+        run: |
+          if ! node -e "const v=require('./manifests/variants.json');process.exit(v.internal.appId?0:1)"; then
+            echo "::error::The Dash-internal app has no app id yet."
+            echo "::error::Run 'forge register' locally (it accepts Atlassian's developer terms,"
+            echo "::error::so a person has to do it), then commit the id into manifests/variants.json."
+            exit 1
+          fi
+
+      - name: Select distribution and build
+        run: npm run build:internal
+
+      - name: Show what is about to deploy
+        run: head -12 manifest.yml
+
+      - name: Deploy
+        env:
+          FORGE_EMAIL: ${{ secrets.FORGE_EMAIL }}
+          FORGE_API_TOKEN: ${{ secrets.FORGE_API_TOKEN }}
+          FORGE_NON_INTERACTIVE: '1'
+        run: forge deploy -e ${{ github.event.inputs.environment || 'development' }}
+
+  # ----------------------------------------------------------------- notes --
+  # Deliberately NOT automated here:
+  #
+  #   forge install / forge install --upgrade
+  #     A major version bump (any scope change) needs a human to read and accept
+  #     the consent screen. This app can delete worklogs and impersonate users;
+  #     that approval should not be a YAML line.
+  #
+  #   forge register
+  #     Accepts Atlassian's developer terms.
+  #
+  # A minor version auto-applies to existing installs, so a normal release needs
+  # no install step at all. A major one will, and the deploy output says so.

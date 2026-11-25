@@ -1,0 +1,148 @@
+# GENERATED FILE — DO NOT EDIT.
+#
+# This is the single structural source of truth for BOTH distributions of the
+# app. scripts/use-manifest.mjs substitutes the placeholders below from
+# manifests/variants.json and writes the result to manifest.yml at the repo
+# root, which is what the Forge CLI reads.
+#
+# Modules, scopes and resources live here exactly once on purpose. The
+# marketplace build and the Dash-internal build must never diverge on scopes:
+# a permission that exists in one and not the other is the kind of difference
+# nobody notices until it is a support ticket.
+#
+# To change what the app DOES, edit this file.
+# To change which app it IS, edit manifests/variants.json.
+#
+# Note on Custom UI: the `render:` property means "use UI Kit" and is
+# deliberately absent from both UI modules. Adding it would switch them to UI
+# Kit and the static resources would stop being served.
+app:
+  id: __APP_ID__
+  runtime:
+    name: nodejs22.x
+    memoryMB: 256
+  licensing:
+    enabled: __LICENSING_ENABLED__
+
+modules:
+  # --------------------------------------------------------------------------
+  # Admin console — Apps > Worklog Restriction Manager in the Jira top nav.
+  # --------------------------------------------------------------------------
+  jira:globalPage:
+    - key: worklog-restriction-admin
+      resource: admin
+      resolver:
+        function: resolver
+      title: __APP_TITLE__
+      layout: native
+      route: __APP_ROUTE__
+
+  # --------------------------------------------------------------------------
+  # Issue panel — per-issue compliance display and enforcement.
+  # --------------------------------------------------------------------------
+  jira:issuePanel:
+    - key: worklog-restriction-panel
+      resource: panel
+      resolver:
+        function: resolver
+      title: Worklog Validator
+      icon: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
+      viewportSize: medium
+
+  # --------------------------------------------------------------------------
+  # Headless enforcement. Product events invoke a plain exported function, never
+  # a resolver, so `worklogHandler` points at its own export.
+  # --------------------------------------------------------------------------
+  trigger:
+    - key: worklog-created-trigger
+      function: worklogHandler
+      events:
+        - avi:jira:created:worklog
+      filter:
+        # The app's own writes must not feed back into it.
+        ignoreSelf: true
+
+  function:
+    - key: resolver
+      handler: index.handler
+    - key: worklogHandler
+      handler: index.onWorklogCreated
+
+resources:
+  - key: admin
+    path: static/admin
+  - key: panel
+    path: static/panel
+
+permissions:
+  # Declared as a MAP, not a list, because `allowImpersonation` is a per-scope
+  # property and is only available in map form. Scopes that are never used
+  # during an impersonated call get an empty map.
+  #
+  # Impersonation exists solely for the restore path: Jira takes a worklog's
+  # author from the authenticated caller, so re-creating a deleted worklog under
+  # its original author requires acting as them.
+  scopes:
+    # Config, audit log and review queue.
+    storage:app: {}
+
+    # Verify the caller holds the ADMINISTER global permission.
+    read:permission:jira: {}
+
+    # Status list for the "After Status Transition" dropdown.
+    read:status:jira: {}
+
+    # Projects tab: names, keys and avatars. `forge lint` treats
+    # GET /project/search as needing this full granular set, not just
+    # read:project:jira + read:avatar:jira.
+    read:project:jira: {}
+    read:project.property:jira: {}
+    read:project-category:jira: {}
+    read:project-version:jira: {}
+    read:project.component:jira: {}
+    read:issue-type:jira: {}
+    read:issue-type-hierarchy:jira: {}
+    read:application-role:jira: {}
+
+    # Resolve issueId -> issue key + project (the worklog event carries neither).
+    read:issue:jira: {}
+    read:issue-meta:jira: {}
+    read:issue-security-level:jira: {}
+    read:issue.vote:jira: {}
+    read:field-configuration:jira: {}
+
+    # Status history for the transition rule.
+    read:issue.changelog:jira: {}
+
+    # Delete-enforcement mode.
+    delete:issue-worklog:jira: {}
+    delete:issue-worklog.property:jira: {}
+    write:issue.time-tracking:jira: {}
+
+    # System notification comment.
+    write:comment:jira: {}
+    read:comment:jira: {}
+    read:comment.property:jira: {}
+
+    # Read worklogs for validation, and re-create them on restore. These are the
+    # scopes the impersonated POST /issue/{key}/worklog needs, so they carry
+    # allowImpersonation.
+    read:issue-worklog:jira:
+      allowImpersonation: true
+    read:issue-worklog.property:jira:
+      allowImpersonation: true
+    write:issue-worklog:jira:
+      allowImpersonation: true
+    write:issue-worklog.property:jira:
+      allowImpersonation: true
+    read:avatar:jira:
+      allowImpersonation: true
+    read:group:jira:
+      allowImpersonation: true
+    read:project-role:jira:
+      allowImpersonation: true
+    read:user:jira:
+      allowImpersonation: true
+
+  # Deliberately all granular (no read:jira-work / write:jira-work): classic
+  # and granular scopes cannot be mixed in one app.

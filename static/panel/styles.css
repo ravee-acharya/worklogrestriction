@@ -1,0 +1,210 @@
+/* Worklog Restriction Manager — issue panel.
+ * Same visual language as the admin console, trimmed to what the panel renders.
+ */
+
+:root {
+  --wrm-text: #172b4d;
+  --wrm-subtle: #5e6c84;
+  --wrm-muted: #6b778c;
+  --wrm-border: #dfe1e6;
+  --wrm-surface: #ffffff;
+  --wrm-surface-sunken: #fafbfc;
+  --wrm-page: #f4f5f7;
+
+  --wrm-green-bg: #e3fcef;
+  --wrm-green-text: #006644;
+  --wrm-green-border: #57d9a3;
+
+  --wrm-red-bg: #ffebe6;
+  --wrm-red-text: #bf2600;
+
+  --wrm-amber-bg: #fffae6;
+  --wrm-amber-text: #974f0c;
+  --wrm-amber-border: #ffc400;
+
+  --wrm-neutral-bg: #dfe1e6;
+  --wrm-neutral-text: #42526e;
+
+  --wrm-radius: 3px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+body {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 14px;
+  line-height: 1.43;
+  color: var(--wrm-text);
+}
+
+.wrm-banner {
+  border-radius: var(--wrm-radius);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.wrm-banner__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.wrm-banner__meta {
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.wrm-banner--amber {
+  background: var(--wrm-amber-bg);
+  border: 1px solid var(--wrm-amber-border);
+  color: var(--wrm-amber-text);
+}
+
+.wrm-banner--red {
+  background: var(--wrm-red-bg);
+  border: 1px solid #ff8f73;
+  color: var(--wrm-red-text);
+}
+
+.wrm-banner--green {
+  background: var(--wrm-green-bg);
+  border: 1px solid var(--wrm-green-border);
+  color: var(--wrm-green-text);
+}
+
+.wrm-banner--grey {
+  background: var(--wrm-page);
+  border: 1px solid var(--wrm-border);
+  color: var(--wrm-neutral-text);
+}
+
+.wrm-card {
+  background: var(--wrm-surface);
+  border: 1px solid var(--wrm-border);
+  border-radius: var(--wrm-radius);
+  overflow: hidden;
+}
+
+.wrm-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.wrm-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--wrm-neutral-text);
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--wrm-border);
+  white-space: nowrap;
+}
+
+.wrm-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--wrm-border);
+  vertical-align: middle;
+}
+
+.wrm-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.wrm-row--violation {
+  background: var(--wrm-amber-bg);
+}
+
+.wrm-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--wrm-radius);
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+.wrm-badge--green {
+  background: var(--wrm-green-bg);
+  color: var(--wrm-green-text);
+}
+
+.wrm-badge--red {
+  background: var(--wrm-red-bg);
+  color: var(--wrm-red-text);
+}
+
+.wrm-badge--amber {
+  background: var(--wrm-amber-bg);
+  color: var(--wrm-amber-text);
+  box-shadow: inset 0 0 0 1px var(--wrm-amber-border);
+}
+
+.wrm-badge--grey {
+  background: var(--wrm-neutral-bg);
+  color: var(--wrm-neutral-text);
+}
+
+.wrm-spinner-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  color: var(--wrm-subtle);
+  font-size: 13px;
+}
+
+.wrm-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--wrm-border);
+  border-top-color: #0052cc;
+  border-radius: 50%;
+  animation: wrm-spin 0.7s linear infinite;
+  flex: 0 0 auto;
+}
+
+@keyframes wrm-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrm-spinner {
+    animation-duration: 2s;
+  }
+}
+
+.wrm-skeleton {
+  height: 12px;
+  border-radius: var(--wrm-radius);
+  background: var(--wrm-border);
+  margin-bottom: 8px;
+}
+
+.wrm-skeleton--short {
+  width: 45%;
+}
+
+.wrm-footnote {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--wrm-muted);
+}

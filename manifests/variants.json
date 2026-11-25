@@ -1,0 +1,33 @@
+{
+  "_comment": [
+    "The two distributions of this app. Everything the app DOES lives in",
+    "manifest.template.yml; this file only says which app it IS.",
+    "",
+    "They are genuinely separate Forge apps with separate app ids, separate",
+    "installations and separate storage. Installing both on one site is fine and",
+    "expected during a cutover — they do not share config or audit log.",
+    "",
+    "appId is the only field that cannot be invented: it comes from",
+    "`forge register`, which must be run by a human because it accepts Atlassian's",
+    "developer terms. Leave it empty until then; use-manifest.mjs refuses to build",
+    "a variant with no id rather than deploying over the wrong app."
+  ],
+
+  "marketplace": {
+    "label": "Marketplace",
+    "appId": "ari:cloud:ecosystem::app/9fb33e39-d7fb-4254-8d79-ec12bd24b4a9",
+    "appTitle": "Worklog Restriction Manager",
+    "appRoute": "worklog-restriction-manager",
+    "licensingEnabled": false,
+    "notes": "The app already live on the Dash Jira site, intended for public listing. licensingEnabled stays false until a licensing model is chosen — turning it on gates the app behind a licence check and is a behaviour change, not a label."
+  },
+
+  "internal": {
+    "label": "Dash internal",
+    "appId": "",
+    "appTitle": "Worklog Restriction Manager (Dash)",
+    "appRoute": "worklog-restriction-manager-dash",
+    "licensingEnabled": false,
+    "notes": "Dash's own private copy. Never listed, never licensed. The distinct title is what lets an admin tell the two apart in the Jira Apps menu once both are installed."
+  }
+}

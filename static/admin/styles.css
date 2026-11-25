@@ -1,0 +1,1102 @@
+/* Worklog Restriction Manager — Admin Console
+ *
+ * The original app declared no font-family, so every browser fell back to its
+ * default serif. That serif look is part of what the console looks like today,
+ * so it is declared explicitly here rather than left to chance.
+ */
+
+:root {
+  --wrm-text: #172b4d;
+  --wrm-subtle: #5e6c84;
+  --wrm-muted: #6b778c;
+  --wrm-border: #dfe1e6;
+  --wrm-border-strong: #c1c7d0;
+  --wrm-page: #f4f5f7;
+  --wrm-surface: #ffffff;
+  --wrm-surface-sunken: #fafbfc;
+
+  --wrm-blue: #0052cc;
+  --wrm-blue-hover: #0065ff;
+  --wrm-blue-pressed: #0747a6;
+  --wrm-blue-subtle: #deebff;
+
+  --wrm-green-bg: #e3fcef;
+  --wrm-green-text: #006644;
+  --wrm-green-border: #57d9a3;
+
+  --wrm-red-bg: #ffebe6;
+  --wrm-red-text: #bf2600;
+
+  --wrm-amber-bg: #fffae6;
+  --wrm-amber-text: #974f0c;
+  --wrm-amber-border: #ffc400;
+
+  --wrm-neutral-bg: #dfe1e6;
+  --wrm-neutral-text: #42526e;
+
+  --wrm-radius: 3px;
+  --wrm-form-width: 640px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 14px;
+  line-height: 1.43;
+  color: var(--wrm-text);
+  background: var(--wrm-surface);
+  -webkit-font-smoothing: antialiased;
+}
+
+code,
+.wrm-mono {
+  font-family: ui-monospace, 'SFMono-Regular', 'Consolas', 'Liberation Mono', Menlo, monospace;
+}
+
+/* ---------------------------------------------------------------- header --- */
+
+.wrm-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 24px 24px 0;
+}
+
+.wrm-header__icon {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--wrm-radius);
+  background: var(--wrm-blue);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wrm-header__icon svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.wrm-header__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.008em;
+}
+
+.wrm-header__subtitle {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--wrm-subtle);
+}
+
+/* ------------------------------------------------------------------ tabs --- */
+
+.wrm-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 16px 24px 0;
+  border-bottom: 2px solid var(--wrm-border);
+}
+
+.wrm-tab {
+  appearance: none;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 500;
+  color: var(--wrm-subtle);
+  padding: 8px 12px;
+  margin-bottom: -2px;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.wrm-tab:hover {
+  color: var(--wrm-text);
+  border-bottom-color: var(--wrm-border-strong);
+}
+
+.wrm-tab[aria-selected='true'] {
+  color: var(--wrm-blue);
+  font-weight: 700;
+  border-bottom-color: var(--wrm-blue);
+}
+
+.wrm-tab:focus-visible {
+  outline: 2px solid var(--wrm-blue);
+  outline-offset: 2px;
+  border-radius: var(--wrm-radius) var(--wrm-radius) 0 0;
+}
+
+/* ------------------------------------------------------------------ body --- */
+
+.wrm-body {
+  background: var(--wrm-page);
+  min-height: calc(100vh - 120px);
+  padding: 20px 24px 48px;
+}
+
+.wrm-section-title {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.wrm-form {
+  max-width: var(--wrm-form-width);
+}
+
+/* ----------------------------------------------------------------- cards --- */
+
+.wrm-card {
+  background: var(--wrm-surface);
+  border: 1px solid var(--wrm-border);
+  border-radius: var(--wrm-radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.wrm-card--flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------- control --- */
+
+.wrm-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--wrm-text);
+  margin-bottom: 6px;
+}
+
+.wrm-hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--wrm-muted);
+}
+
+.wrm-select,
+.wrm-input,
+.wrm-textarea {
+  width: 100%;
+  font: inherit;
+  color: var(--wrm-text);
+  background: var(--wrm-surface);
+  border: 1px solid var(--wrm-border-strong);
+  border-radius: var(--wrm-radius);
+  padding: 6px 8px;
+  min-height: 34px;
+}
+
+.wrm-select:focus,
+.wrm-input:focus,
+.wrm-textarea:focus {
+  outline: none;
+  border-color: var(--wrm-blue);
+  box-shadow: 0 0 0 2px var(--wrm-blue-subtle);
+}
+
+.wrm-select:disabled,
+.wrm-input:disabled {
+  background: var(--wrm-page);
+  color: var(--wrm-muted);
+  cursor: not-allowed;
+}
+
+.wrm-textarea {
+  min-height: 84px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.wrm-field {
+  margin-bottom: 16px;
+}
+
+.wrm-field:last-child {
+  margin-bottom: 0;
+}
+
+/* Inline validation. Added for the "invalid config saved silently" fix. */
+.wrm-select[aria-invalid='true'],
+.wrm-input[aria-invalid='true'] {
+  border-color: var(--wrm-red-text);
+}
+
+.wrm-error {
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--wrm-red-text);
+}
+
+/* ------------------------------------------------------------- checkbox --- */
+
+.wrm-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.wrm-check input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--wrm-blue);
+  cursor: pointer;
+}
+
+.wrm-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wrm-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.wrm-radio input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--wrm-blue);
+  cursor: pointer;
+}
+
+/* -------------------------------------------------------------- template --- */
+
+.wrm-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.wrm-card__head .wrm-label {
+  margin-bottom: 0;
+}
+
+.wrm-link {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 12px;
+  color: var(--wrm-blue);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.wrm-link:hover {
+  color: var(--wrm-blue-hover);
+}
+
+.wrm-counter {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--wrm-muted);
+  text-align: right;
+}
+
+.wrm-counter--over {
+  color: var(--wrm-red-text);
+  font-weight: 700;
+}
+
+.wrm-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.wrm-token {
+  appearance: none;
+  font-family: ui-monospace, 'SFMono-Regular', 'Consolas', 'Liberation Mono', Menlo, monospace;
+  font-size: 11px;
+  background: var(--wrm-page);
+  border: 1px solid var(--wrm-border);
+  border-radius: var(--wrm-radius);
+  padding: 2px 6px;
+  color: var(--wrm-neutral-text);
+  cursor: pointer;
+}
+
+.wrm-token:hover {
+  background: var(--wrm-blue-subtle);
+  border-color: var(--wrm-blue);
+  color: var(--wrm-blue-pressed);
+}
+
+.wrm-preview {
+  background: var(--wrm-surface-sunken);
+  border: 1px solid var(--wrm-border);
+  border-radius: var(--wrm-radius);
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.wrm-mention {
+  background: var(--wrm-blue-subtle);
+  color: var(--wrm-blue-pressed);
+  border-radius: 10px;
+  padding: 0 6px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.wrm-footnote {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: var(--wrm-muted);
+}
+
+/* --------------------------------------------------------------- buttons --- */
+
+.wrm-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.wrm-btn {
+  appearance: none;
+  font: inherit;
+  font-weight: 700;
+  border: 1px solid transparent;
+  border-radius: var(--wrm-radius);
+  padding: 7px 14px;
+  cursor: pointer;
+  background: var(--wrm-blue);
+  color: #fff;
+}
+
+.wrm-btn:hover:not(:disabled) {
+  background: var(--wrm-blue-hover);
+}
+
+.wrm-btn:active:not(:disabled) {
+  background: var(--wrm-blue-pressed);
+}
+
+.wrm-btn:disabled {
+  background: #a5c1ee;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.wrm-btn--subtle {
+  background: var(--wrm-surface);
+  border-color: var(--wrm-border-strong);
+  color: var(--wrm-text);
+}
+
+.wrm-btn--subtle:hover:not(:disabled) {
+  background: var(--wrm-page);
+}
+
+.wrm-btn--positive {
+  background: var(--wrm-green-bg);
+  border-color: var(--wrm-green-border);
+  color: var(--wrm-green-text);
+}
+
+.wrm-btn--positive:hover:not(:disabled) {
+  background: #c7f6dd;
+}
+
+.wrm-btn--positive:disabled,
+.wrm-btn--subtle:disabled {
+  background: var(--wrm-page);
+  border-color: var(--wrm-border);
+  color: var(--wrm-muted);
+  cursor: not-allowed;
+}
+
+.wrm-btn--link {
+  background: none;
+  border: 0;
+  color: var(--wrm-blue);
+  font-weight: 400;
+  text-decoration: underline;
+  padding: 2px 4px;
+}
+
+.wrm-status {
+  font-size: 13px;
+}
+
+.wrm-status--ok {
+  color: var(--wrm-green-text);
+}
+
+.wrm-status--err {
+  color: var(--wrm-red-text);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------- toolbar --- */
+
+/* Sticky so the search box and the bulk buttons stay reachable while scrolling
+ * 200+ project rows — you can no longer forget a filter is active. */
+.wrm-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--wrm-page);
+  padding: 4px 0 12px;
+}
+
+.wrm-toolbar .wrm-input {
+  flex: 1 1 auto;
+}
+
+.wrm-toolbar__btns {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+/* ---------------------------------------------------------------- tables --- */
+
+.wrm-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--wrm-surface);
+}
+
+.wrm-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--wrm-neutral-text);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--wrm-border);
+  background: var(--wrm-surface);
+  white-space: nowrap;
+}
+
+.wrm-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--wrm-border);
+  vertical-align: middle;
+}
+
+.wrm-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.wrm-table tbody tr:hover {
+  background: var(--wrm-surface-sunken);
+}
+
+.wrm-table__num {
+  text-align: right;
+}
+
+.wrm-table__actions {
+  text-align: right;
+  width: 1%;
+  white-space: nowrap;
+}
+
+.wrm-row--pending {
+  background: var(--wrm-amber-bg);
+}
+
+.wrm-row--pending:hover {
+  background: #fff5d1;
+}
+
+.wrm-project {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wrm-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--wrm-radius);
+  flex: 0 0 auto;
+  object-fit: cover;
+  background: var(--wrm-border);
+}
+
+/* Initials stand-in for the project avatars that 404. */
+.wrm-avatar--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ui-monospace, 'SFMono-Regular', 'Consolas', 'Liberation Mono', Menlo, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--wrm-blue-pressed);
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.wrm-key {
+  font-family: ui-monospace, 'SFMono-Regular', 'Consolas', 'Liberation Mono', Menlo, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--wrm-muted);
+  text-transform: uppercase;
+}
+
+.wrm-issue-link {
+  font-family: ui-monospace, 'SFMono-Regular', 'Consolas', 'Liberation Mono', Menlo, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--wrm-blue);
+  text-decoration: none;
+}
+
+.wrm-issue-link:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------- badges --- */
+
+.wrm-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--wrm-radius);
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+.wrm-badge--green {
+  background: var(--wrm-green-bg);
+  color: var(--wrm-green-text);
+}
+
+.wrm-badge--grey {
+  background: var(--wrm-neutral-bg);
+  color: var(--wrm-neutral-text);
+}
+
+.wrm-badge--red {
+  background: var(--wrm-red-bg);
+  color: var(--wrm-red-text);
+}
+
+.wrm-badge--amber {
+  background: var(--wrm-amber-bg);
+  color: var(--wrm-amber-text);
+  box-shadow: inset 0 0 0 1px var(--wrm-amber-border);
+}
+
+/* ---------------------------------------------------------------- toggle --- */
+
+.wrm-toggle {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.wrm-toggle input {
+  position: absolute;
+  /* Anchor the hit area over the track. Without an explicit inset the box
+   * falls back to its static position, which `text-align: right` on the
+   * containing cell shifts clear of the visible switch — the control then
+   * looks fine and simply cannot be clicked. */
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+.wrm-toggle__track {
+  position: absolute;
+  inset: 0;
+  background: #b3bac5;
+  border-radius: 9px;
+  transition: background 0.15s ease-in-out;
+  pointer-events: none;
+}
+
+.wrm-toggle__track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s ease-in-out;
+}
+
+.wrm-toggle input:checked + .wrm-toggle__track {
+  background: var(--wrm-blue);
+}
+
+.wrm-toggle input:checked + .wrm-toggle__track::after {
+  transform: translateX(16px);
+}
+
+.wrm-toggle input:focus-visible + .wrm-toggle__track {
+  box-shadow: 0 0 0 2px var(--wrm-blue-subtle);
+}
+
+.wrm-toggle input:disabled + .wrm-toggle__track {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ------------------------------------------------------------ pagination --- */
+
+.wrm-pager {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--wrm-subtle);
+}
+
+.wrm-pager__pages {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.wrm-pager__btn {
+  appearance: none;
+  font: inherit;
+  font-size: 12px;
+  min-width: 28px;
+  padding: 4px 6px;
+  background: var(--wrm-surface);
+  border: 1px solid var(--wrm-border-strong);
+  border-radius: var(--wrm-radius);
+  color: var(--wrm-text);
+  cursor: pointer;
+}
+
+.wrm-pager__btn:hover:not(:disabled) {
+  background: var(--wrm-page);
+}
+
+.wrm-pager__btn[aria-current='true'] {
+  background: var(--wrm-blue);
+  border-color: var(--wrm-blue);
+  color: #fff;
+  font-weight: 700;
+}
+
+.wrm-pager__btn:disabled {
+  color: var(--wrm-muted);
+  cursor: not-allowed;
+  background: var(--wrm-page);
+}
+
+.wrm-pager__spacer {
+  flex: 1 1 auto;
+}
+
+/* ------------------------------------------------------------ stat cards --- */
+
+.wrm-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.wrm-stat {
+  background: var(--wrm-surface);
+  border: 1px solid var(--wrm-border);
+  border-radius: var(--wrm-radius);
+  padding: 14px 16px;
+}
+
+.wrm-stat__value {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.wrm-stat__label {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--wrm-subtle);
+}
+
+/* The original cards said "REMOVED THIS MONTH" with no month named, which read
+ * as broken next to a table full of older entries. */
+.wrm-stat__scope {
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--wrm-muted);
+}
+
+/* --------------------------------------------------------- summary table --- */
+
+.wrm-summary {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--wrm-surface);
+}
+
+.wrm-summary th {
+  text-align: left;
+  width: 210px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--wrm-text);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--wrm-border);
+  vertical-align: top;
+}
+
+.wrm-summary td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--wrm-border);
+}
+
+.wrm-summary tr:last-child th,
+.wrm-summary tr:last-child td {
+  border-bottom: 0;
+}
+
+/* --------------------------------------------------------------- banners --- */
+
+.wrm-banner {
+  border-radius: var(--wrm-radius);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.wrm-banner__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.wrm-banner--amber {
+  background: var(--wrm-amber-bg);
+  border: 1px solid var(--wrm-amber-border);
+  color: var(--wrm-amber-text);
+}
+
+.wrm-banner--red {
+  background: var(--wrm-red-bg);
+  border: 1px solid #ff8f73;
+  color: var(--wrm-red-text);
+}
+
+.wrm-banner--green {
+  background: var(--wrm-green-bg);
+  border: 1px solid var(--wrm-green-border);
+  color: var(--wrm-green-text);
+}
+
+.wrm-banner--grey {
+  background: var(--wrm-page);
+  border: 1px solid var(--wrm-border);
+  color: var(--wrm-neutral-text);
+}
+
+/* ------------------------------------------------------- states / misc --- */
+
+.wrm-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--wrm-muted);
+  font-size: 13px;
+}
+
+.wrm-spinner-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 0;
+  color: var(--wrm-subtle);
+  font-size: 13px;
+}
+
+.wrm-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--wrm-border);
+  border-top-color: var(--wrm-blue);
+  border-radius: 50%;
+  animation: wrm-spin 0.7s linear infinite;
+  flex: 0 0 auto;
+}
+
+@keyframes wrm-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrm-spinner {
+    animation-duration: 2s;
+  }
+  .wrm-toggle__track,
+  .wrm-toggle__track::after {
+    transition: none;
+  }
+}
+
+.wrm-denied {
+  max-width: 520px;
+  margin: 48px auto;
+  text-align: center;
+}
+
+.wrm-denied__title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.wrm-denied__body {
+  font-size: 13px;
+  color: var(--wrm-subtle);
+}
+
+.wrm-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------- collapsible log sections --- */
+
+.wrm-collapse-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 12px;
+}
+
+.wrm-collapse-head:first-child {
+  margin-top: 0;
+}
+
+.wrm-collapse-btn {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--wrm-text);
+}
+
+.wrm-collapse-btn .wrm-section-title {
+  margin: 0;
+}
+
+.wrm-collapse-btn:hover .wrm-section-title {
+  color: var(--wrm-blue);
+}
+
+.wrm-collapse-btn:focus-visible {
+  outline: 2px solid var(--wrm-blue);
+  outline-offset: 2px;
+  border-radius: var(--wrm-radius);
+}
+
+.wrm-collapse-caret {
+  font-size: 11px;
+  color: var(--wrm-subtle);
+  width: 10px;
+}
+
+/* The count stays legible while collapsed: folding away the rows must not hide
+ * the fact that rows exist. */
+.wrm-collapse-count {
+  font-family: ui-monospace, 'SFMono-Regular', 'Consolas', 'Liberation Mono', Menlo, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--wrm-neutral-bg);
+  color: var(--wrm-neutral-text);
+  border-radius: 10px;
+  padding: 1px 8px;
+}
+
+/* ----------------------------------------------------------- sortable header --- */
+
+.wrm-sort-btn {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--wrm-neutral-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.wrm-sort-btn:hover {
+  color: var(--wrm-blue);
+}
+
+.wrm-sort-btn:focus-visible {
+  outline: 2px solid var(--wrm-blue);
+  outline-offset: 2px;
+  border-radius: var(--wrm-radius);
+}
+
+.wrm-sort-caret {
+  font-size: 8px;
+  color: var(--wrm-blue);
+}
+
+/* Download control parked at the right end of a collapsible heading. It stays
+ * usable while the section is folded — exporting should not require unfolding
+ * several hundred rows first. */
+.wrm-collapse-head__actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+/* Plain-English read-out of the selected restriction period. Deliberately
+ * prominent rather than a footnote: misreading the rule costs a month of
+ * timesheets, so it should be hard to skip past. */
+.wrm-explain {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--wrm-border);
+  border-left: 3px solid var(--wrm-blue);
+  border-radius: var(--wrm-radius);
+  background: var(--wrm-neutral-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.wrm-explain__row {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.wrm-explain__tag {
+  flex: 0 0 auto;
+  min-width: 46px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 3px;
+  text-align: center;
+}
+
+.wrm-explain__tag--ok {
+  background: var(--wrm-green-bg, #e3fcef);
+  color: var(--wrm-green-text, #006644);
+}
+
+.wrm-explain__tag--no {
+  background: var(--wrm-red-bg, #ffebe6);
+  color: var(--wrm-red-text, #bf2600);
+}
+
+/* Month + user filters above an audit table. */
+.wrm-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 8px 0 12px;
+}
+
+/* The base .wrm-select is width:100%, which makes every control claim a full
+ * row inside a flex bar. Override it here so the filters sit on one line. */
+.wrm-filters .wrm-select {
+  flex: 0 1 auto;
+  width: auto;
+  min-width: 150px;
+  max-width: 220px;
+}
+
+.wrm-filters__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--wrm-subtle);
+}
+
+/* Shown only while a filter is active, so the visible count can never be
+ * mistaken for the size of the whole log. */
+.wrm-filters__count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--wrm-blue);
+  background: var(--wrm-neutral-bg);
+  border-radius: 3px;
+  padding: 2px 8px;
+}

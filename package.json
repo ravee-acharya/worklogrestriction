@@ -1,0 +1,32 @@
+{
+  "name": "worklog-restriction-manager",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Jira Cloud Forge app that enforces company-defined time-logging policies.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "preview:build": "node scripts/copy-preview.mjs && node scripts/build.mjs --preview",
+    "preview": "npm run preview:build && node scripts/preview-server.mjs",
+    "test": "node --test \"test/*.test.mjs\"",
+    "manifest:marketplace": "node scripts/use-manifest.mjs marketplace",
+    "manifest:internal": "node scripts/use-manifest.mjs internal",
+    "build:marketplace": "npm run manifest:marketplace && npm run build",
+    "build:internal": "npm run manifest:internal && npm run build",
+    "deploy:marketplace": "npm run build:marketplace && forge deploy -e production",
+    "deploy:internal": "npm run build:internal && forge deploy -e production",
+    "deploy:marketplace:dev": "npm run build:marketplace && forge deploy -e development",
+    "deploy:internal:dev": "npm run build:internal && forge deploy -e development",
+    "verify": "npm test && npm run check:bundle && npm run build",
+    "check:bundle": "node scripts/check-bundle-hygiene.mjs"
+  },
+  "dependencies": {
+    "@forge/api": "^4.1.0",
+    "@forge/bridge": "^4.1.0",
+    "@forge/kvs": "^1.1.0",
+    "@forge/resolver": "^1.6.6"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}
